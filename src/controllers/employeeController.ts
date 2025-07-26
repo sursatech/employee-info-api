@@ -4,14 +4,95 @@ import prisma from '../prisma/client';
 // Create a new employee
 export const createEmployee = async (req: Request, res: Response) => {
   try {
-    const { name, email, position, department, salary } = req.body;
-    const employee = await prisma.employee.create({
-      data: { 
-        name, 
+    console.log('Received request body:', JSON.stringify(req.body, null, 2));
+    // Handle potential field name variations
+    const { 
+      name, 
+      email, 
+      position, 
+      department, 
+      salary,
+      age, // in case frontend is still sending student data
+      fullName, // in case frontend sends fullName instead of name
+      annualSalary, // in case frontend sends annualSalary instead of salary
+      hireDate // in case frontend sends hireDate
+    } = req.body;
+    
+    // Use fallback field names if primary ones are missing
+    const employeeName = name || fullName;
+    const employeeSalary = salary || annualSalary;
+    
+    console.log('Extracted fields:', { 
+      name: employeeName, 
+      email, 
+      position, 
+      department, 
+      salary: employeeSalary,
+      hireDate 
+    });
+    
+    // Check if frontend is sending student data instead of employee data
+    if (age !== undefined && (!position && !department && !salary)) {
+      return res.status(400).json({
+        error: 'Frontend is sending student data instead of employee data. Please update your frontend form to include: position, department, and salary fields.',
+        received: req.body,
+        expected: {
+          name: 'string',
+          email: 'string', 
+          position: 'string',
+          department: 'string',
+          salary: 'number'
+        },
+        note: 'Your frontend form appears to be using the student form structure. Please update it to use the employee form structure.'
+      });
+    }
+    
+    // Validate required fields
+    if (!employeeName || !email || !position || !department || employeeSalary === undefined) {
+      console.log('Validation failed:', { 
+        name: employeeName, 
         email, 
         position, 
         department, 
-        salary: parseFloat(salary) 
+        salary: employeeSalary 
+      });
+      return res.status(400).json({ 
+        error: 'Missing required fields. Please provide: name, email, position, department, and salary',
+        received: { 
+          name: employeeName, 
+          email, 
+          position, 
+          department, 
+          salary: employeeSalary 
+        },
+        expected: {
+          name: 'string',
+          email: 'string',
+          position: 'string', 
+          department: 'string',
+          salary: 'number'
+        }
+      });
+    }
+    
+    // Clean salary - remove currency symbols and commas
+    const cleanSalary = String(employeeSalary).replace(/[$,]/g, '');
+    const salaryNumber = parseFloat(cleanSalary);
+    if (isNaN(salaryNumber)) {
+      return res.status(400).json({ 
+        error: 'Salary must be a valid number',
+        received: employeeSalary,
+        cleaned: cleanSalary
+      });
+    }
+    
+    const employee = await prisma.employee.create({
+      data: { 
+        name: String(employeeName), 
+        email: String(email), 
+        position: String(position), 
+        department: String(department), 
+        salary: salaryNumber 
       },
     });
     res.status(201).json(employee);
@@ -51,15 +132,31 @@ export const updateEmployee = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { name, email, position, department, salary, isActive } = req.body;
+    
+    // Validate required fields
+    if (!name || !email || !position || !department || salary === undefined) {
+      return res.status(400).json({ 
+        error: 'Missing required fields. Please provide: name, email, position, department, and salary' 
+      });
+    }
+    
+    // Validate salary is a valid number
+    const salaryNumber = parseFloat(salary);
+    if (isNaN(salaryNumber)) {
+      return res.status(400).json({ 
+        error: 'Salary must be a valid number' 
+      });
+    }
+    
     const employee = await prisma.employee.update({
       where: { id: Number(id) },
       data: { 
-        name, 
-        email, 
-        position, 
-        department, 
-        salary: parseFloat(salary),
-        isActive 
+        name: String(name), 
+        email: String(email), 
+        position: String(position), 
+        department: String(department), 
+        salary: salaryNumber,
+        isActive: isActive !== undefined ? Boolean(isActive) : true
       },
     });
     res.json(employee);
