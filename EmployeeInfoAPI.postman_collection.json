@@ -1,0 +1,125 @@
+{
+  "info": {
+    "name": "Employee Info API",
+    "description": "Collection for testing Employee Info API endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Get All Employees",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3001/employees",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3001",
+          "path": ["employees"]
+        }
+      }
+    },
+    {
+      "name": "Get Active Employees",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3001/employees/active",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3001",
+          "path": ["employees", "active"]
+        }
+      }
+    },
+    {
+      "name": "Get Employees by Department",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3001/employees/department/Engineering",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3001",
+          "path": ["employees", "department", "Engineering"]
+        }
+      }
+    },
+    {
+      "name": "Get Employee by ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3001/employees/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3001",
+          "path": ["employees", "1"]
+        }
+      }
+    },
+    {
+      "name": "Create Employee",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john.doe@company.com\",\n  \"position\": \"Software Engineer\",\n  \"department\": \"Engineering\",\n  \"salary\": 75000\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3001/employees",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3001",
+          "path": ["employees"]
+        }
+      }
+    },
+    {
+      "name": "Update Employee",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"John Doe Updated\",\n  \"email\": \"john.doe.updated@company.com\",\n  \"position\": \"Senior Software Engineer\",\n  \"department\": \"Engineering\",\n  \"salary\": 85000,\n  \"isActive\": true\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3001/employees/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3001",
+          "path": ["employees", "1"]
+        }
+      }
+    },
+    {
+      "name": "Delete Employee",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3001/employees/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3001",
+          "path": ["employees", "1"]
+        }
+      }
+    }
+  ]
+} 
